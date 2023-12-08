@@ -1,23 +1,59 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import TaskInput from "./components/TaskInput";
+import AddTask from "./components/AddTask";
 
 function App() {
+  const [taskDetail, setTaskDetail] = useState({
+    task: "",
+    taskDesc: "",
+  });
+
+  const taskHandler = (event) => {
+    setTaskDetail((prevData) => {
+      return {
+        ...prevData,
+        [event.target.name]: event.target.value,
+      };
+    });
+
+  };
+
+  const [tasks, setTasks] = useState([]);
+
+  const addTaskHandler = (event) => {
+    event.preventDefault();
+    setTasks([...tasks, taskDetail]);
+    setTaskDetail({task:"",taskDesc:""});
+  };
+
+  const deleteTask = (i) => {
+    let copyTask = [...tasks];
+    copyTask.splice(i,1);
+    setTasks(copyTask);
+  }
+
+  let renderTask = <h2>No Task Available</h2>;
+
+  if (tasks.length > 0) {
+    renderTask = tasks.map((t, i) => {
+      return <AddTask task={t} taskId={i} deleteTask={deleteTask}/>;
+    });
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div className="py-8 bg-black text-white text-center">
+        <h1 className="text-5xl font-bold">Personal To Do List</h1>
+      </div>
+
+      <TaskInput
+        addTaskHandler={addTaskHandler}
+        tasks={tasks}
+        taskDetail={taskDetail}
+        taskHandler={taskHandler}
+      />
+
+      <div>{renderTask}</div>
     </div>
   );
 }
